@@ -1,7 +1,5 @@
 #include "BoothAlg.h"
 
-
-
 std::string BoothAlg::convertIntToBinaryString(int number)
 {
     bool negative = false;
@@ -19,12 +17,12 @@ std::string BoothAlg::convertIntToBinaryString(int number)
     }
 
     std::string outcome(32, '0');
-    for(int i = 31; !binary.empty(); i--)
+    for (int i = 31; !binary.empty(); i--)
     {
-        outcome[i] = binary.front();
+        outcome[i] = binary.front() + 0x30;
         binary.pop();
     }
-    if(negative)
+    if (negative)
     {
         onesComplement(outcome);
         twosComplement(outcome);
@@ -33,20 +31,17 @@ std::string BoothAlg::convertIntToBinaryString(int number)
     return outcome;
 }
 
-
 void BoothAlg::onesComplement(std::string &binaryNum)
 {
     for (int i = 0; i < binaryNum.length(); i++)
     {
         if (binaryNum[i] == '0')
-            binaryNum[i] == '1';
+            binaryNum[i] = '1';
         else
-            binaryNum[i] == '0';
+            binaryNum[i] = '0';
     }
     // will do the opposite of what it is yk
 }
-
-
 
 void BoothAlg::twosComplement(std::string &binaryNum)
 {
@@ -91,4 +86,10 @@ BoothAlg::BoothAlg()
     multiplierString = std::string(32, '0');
     multiplicandString = std::string(32, '0');
     // makes both string default to 0, will be changed later on
+}
+
+
+void BoothAlg::run()
+{
+    
 }

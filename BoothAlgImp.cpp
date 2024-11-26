@@ -1,12 +1,22 @@
 #include "BoothAlg.h"
 
+void BoothAlg::waitThisLong(int ms)
+{
+    napms(2000);
+    timeout(1);
+    while (getch() != ERR)
+    {
+    }
+    timeout(-1);
+}
+
 bool BoothAlg::validInt(std::string input)
 {
     if (input.length() > 12)
         return false;
     for (int i = 0; i < input.length(); i++)
     {
-        if (!(0x30 <= input[i] && input[i] <= 0x39))
+        if (!((0x30 <= input[i] && input[i] <= 0x39) || input[i] == '-'))
         {
             return false;
         }
@@ -190,7 +200,7 @@ void BoothAlg::run()
             bool goodMultiplier = false, goodMultiplicand = false;
             while (!goodMultiplier)
             {
-                
+
                 move(2, 2);
                 printw("Give the multiplier, let it be in the range of a signed 32-bit");
                 refresh();
@@ -219,9 +229,113 @@ void BoothAlg::run()
                     continue;
                 }
             }
-
+            clear();
+            while (!goodMultiplicand)
+            {
+                move(2, 2);
+                printw("Now give the multiplicand, let it be in the range of a signed 32-bit");
+                refresh();
+                move(3, 2);
+                getstr(buffer);
+                std::string temp = buffer;
+                if (validInt(temp))
+                {
+                    multiplicandString = convertIntToBinaryString(std::stoi(temp));
+                    goodMultiplicand = true;
+                }
+                else
+                {
+                    noecho();
+                    clear();
+                    move(1, 2);
+                    printw("Not a valid number");
+                    refresh();
+                    napms(2000);
+                    timeout(1);
+                    while (getch() != ERR)
+                    {
+                    }
+                    timeout(-1);
+                    echo();
+                    continue;
+                }
+            }
 
             noecho();
+            // first is intialization
+            clear();
+            move(2, 2);
+            printw("First, we have to initalize");
+
+            std::string product(32, '0');
+            char boothBit = '0';
+            product = product + multiplierString;
+            move(3, 2);
+            printw("Multiplier:   %s", multiplierString.c_str());
+            move(4, 2);
+            printw("Multiplicand: %s", multiplicandString.c_str());
+            move(5, 2);
+            printw("Product:      %s", product.c_str());
+            move(6, 2);
+            printw("Booth Bit:    %c", boothBit);
+            refresh();
+            waitThisLong(2000);
+            move(8, 2);
+            printw("Press any button to go to next step");
+            refresh();
+            getch();
+
+            for (int i = 1; i <= 32; i++)
+            {
+                clear();
+                move(3, 2);
+                printw("Step %d", i);
+                move(4, 2);
+                printw("Multiplier:   %s", multiplierString.c_str());
+                move(5, 2);
+                printw("Multiplicand: %s", multiplicandString.c_str());
+                move(6, 2);
+                printw("Product:      %s", product.c_str());
+                move(7, 2);
+                printw("Booth Bit:    %c", boothBit);
+                move(10, 2);
+
+                std::string whichOfThe4Options = "", boothCombination = "";
+
+                boothCombination.push_back(product[product.length() - 1]);
+                boothCombination.push_back(boothBit);
+
+                bool additionOperation = false, subtractionOperation = false, noOp = false;
+
+                if (boothCombination == "00" || boothCombination == "11")
+                {
+                    whichOfThe4Options = "The least significant bit and booth bit was " + boothCombination + ". Therefore no operation";
+                    noOp = true;
+                }
+                else if (boothCombination == "01")
+                {
+                    whichOfThe4Options = "The least significatn bit and booth bit was " + boothCombination + ". Therefore an addition operation needs to be done.";
+                    additionOperation = true;
+                }
+                else if (boothCombination == "10")
+                {
+                    whichOfThe4Options = "The least significatn bit and booth bit was " + boothCombination + ". Therefore a subtraction operation needs to be done";
+                    subtractionOperation = true;
+                }
+                else
+                {
+                    throw std::out_of_range("I dont even know how this would happen");
+                }
+
+                printw("%s", whichOfThe4Options.c_str());
+                refresh();
+                waitThisLong(2000);
+
+                move(12,2);
+                printw("Press any button to go to next step...");
+                refresh();
+                getch();
+            }
         }
         else if ((char)choice == '3')
         {

@@ -20,6 +20,13 @@ class BoothAlg
     std::string multiplicandString;
     // the string version of the multiplicand
 
+
+
+    /*
+    Helper function that will wait how ever long ms
+    */
+    void waitThisLong(int ms);
+
     /*
     Helper function that returns true if this is a valid int to convert
     */

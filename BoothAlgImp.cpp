@@ -1,4 +1,5 @@
 #include "BoothAlg.h"
+#include <algorithm>
 
 void BoothAlg::waitThisLong(int ms)
 {
@@ -86,9 +87,9 @@ void BoothAlg::twosComplement(std::string &binaryNum)
 
 std::string BoothAlg::addBinary(std::string first, std::string second)
 {
-    std::string outcome(32, '0'); // makes outcome by default 0
-    bool carry = false;           // this will be the carry flag
-    for (int i = 31; i != -1; i--)
+    std::string outcome(std::max(first.length(), second.length()), '0'); // makes outcome by default 0
+    bool carry = false;                                                  // this will be the carry flag
+    for (int i = std::max(first.length(), second.length()) - 1; i != -1; i--)
     {
         int ones = 0; // counts how many ones
         if (carry)
@@ -331,10 +332,96 @@ void BoothAlg::run()
                 refresh();
                 waitThisLong(2000);
 
-                move(12,2);
+                move(12, 2);
                 printw("Press any button to go to next step...");
                 refresh();
                 getch();
+
+                if (additionOperation)
+                {
+                    std::string replaceLHS = addBinary(product.substr(0, 32), multiplicandString);
+                    product = replaceLHS + product.substr(32);
+                    clear();
+                    move(3, 2);
+                    printw("Step %d", i);
+                    move(4, 2);
+                    printw("Multiplier:   %s", multiplierString.c_str());
+                    move(5, 2);
+                    printw("Multiplicand: %s", multiplicandString.c_str());
+                    move(6, 2);
+                    printw("Product:      %s", product.c_str());
+                    move(7, 2);
+                    printw("Booth Bit:    %c", boothBit);
+                    move(10, 2);
+                    printw("An addition operation has been done with the multiplicand and the LHS of the product");
+
+                    refresh();
+                    waitThisLong(2000);
+
+                    move(12, 2);
+                    printw("Press any button to go to next step...");
+                    refresh();
+                    getch();
+                }
+                else if (subtractionOperation)
+                {
+                    std::string multiplicandStringNegated = multiplicandString;
+                    onesComplement(multiplicandStringNegated);
+                    twosComplement(multiplicandStringNegated);
+                    std::string replaceLHS = addBinary(product.substr(0, 32), multiplicandStringNegated);
+                    
+                    product = replaceLHS + product.substr(32);
+
+                    clear();
+                    move(3, 2);
+                    printw("Step %d", i);
+                    move(4, 2);
+                    printw("Multiplier:   %s", multiplierString.c_str());
+                    move(5, 2);
+                    printw("Multiplicand: %s", multiplicandString.c_str());
+                    move(6, 2);
+                    printw("Product:      %s", product.c_str());
+                    move(7, 2);
+                    printw("Booth Bit:    %c", boothBit);
+                    move(10, 2);
+                    printw("A subtraction operation has been done with the multiplicand and the LHS of the product");
+
+                    refresh();
+                    waitThisLong(2000);
+
+                    move(12, 2);
+                    printw("Press any button to go to next step...");
+                    refresh();
+                    getch();
+                }
+
+                boothBit = shiftRightWithBoothBitReturn(product);
+
+                clear();
+                move(3, 2);
+                printw("Step %d", i);
+                move(4, 2);
+                printw("Multiplier:   %s", multiplierString.c_str());
+                move(5, 2);
+                printw("Multiplicand: %s", multiplicandString.c_str());
+                move(6, 2);
+                printw("Product:      %s", product.c_str());
+                move(7, 2);
+                printw("Booth Bit:    %c", boothBit);
+                move(10, 2);
+                printw("Now to shift the product bits to the left...");
+
+                refresh();
+                waitThisLong(2000);
+
+                move(12, 2);
+                printw("Press any button to go to next step...");
+                refresh();
+                getch();
+
+
+
+                // have to shift here
             }
         }
         else if ((char)choice == '3')

@@ -13,7 +13,7 @@ void BoothAlg::waitThisLong(int ms)
 
 bool BoothAlg::validInt(std::string input)
 {
-    if (input.length() > 12)
+    if (input.length() > 12 || input.empty())
         return false;
     for (int i = 0; i < input.length(); i++)
     {
@@ -369,7 +369,7 @@ void BoothAlg::run()
                     onesComplement(multiplicandStringNegated);
                     twosComplement(multiplicandStringNegated);
                     std::string replaceLHS = addBinary(product.substr(0, 32), multiplicandStringNegated);
-                    
+
                     product = replaceLHS + product.substr(32);
 
                     clear();
@@ -419,10 +419,26 @@ void BoothAlg::run()
                 refresh();
                 getch();
 
-
-
                 // have to shift here
             }
+            clear();
+            move(4, 2);
+            printw("Multiplier:   %s", multiplierString.c_str());
+            move(5, 2);
+            printw("Multiplicand: %s", multiplicandString.c_str());
+            move(6, 2);
+            printw("Product:      %s", product.c_str());
+            move(7, 2);
+            printw("Booth Bit:    %c", boothBit);
+            move(10, 2);
+            printw("Here is the final result.");
+            refresh();
+            waitThisLong(2000);
+
+            move(12, 2);
+            printw("Press any button to go back to the menu");
+            refresh();
+            getch();
         }
         else if ((char)choice == '3')
         {

@@ -286,20 +286,25 @@ void BoothAlg::run()
             refresh();
             getch();
 
+            bool userWantItToBeDone = false;
+
             for (int i = 1; i <= 32; i++)
             {
-                clear();
-                move(3, 2);
-                printw("Step %d", i);
-                move(4, 2);
-                printw("Multiplier:   %s", multiplierString.c_str());
-                move(5, 2);
-                printw("Multiplicand: %s", multiplicandString.c_str());
-                move(6, 2);
-                printw("Product:      %s", product.c_str());
-                move(7, 2);
-                printw("Booth Bit:    %c", boothBit);
-                move(10, 2);
+                if (!userWantItToBeDone)
+                {
+                    clear();
+                    move(3, 2);
+                    printw("Step %d", i);
+                    move(4, 2);
+                    printw("Multiplier:   %s", multiplierString.c_str());
+                    move(5, 2);
+                    printw("Multiplicand: %s", multiplicandString.c_str());
+                    move(6, 2);
+                    printw("Product:      %s", product.c_str());
+                    move(7, 2);
+                    printw("Booth Bit:    %c", boothBit);
+                    move(10, 2);
+                }
 
                 std::string whichOfThe4Options = "", boothCombination = "";
 
@@ -327,41 +332,56 @@ void BoothAlg::run()
                 {
                     throw std::out_of_range("I dont even know how this would happen");
                 }
-
-                printw("%s", whichOfThe4Options.c_str());
-                refresh();
-                waitThisLong(2000);
-
-                move(12, 2);
-                printw("Press any button to go to next step...");
-                refresh();
-                getch();
-
-                if (additionOperation)
+                char choice = '\0';
+                if (!userWantItToBeDone)
                 {
-                    std::string replaceLHS = addBinary(product.substr(0, 32), multiplicandString);
-                    product = replaceLHS + product.substr(32);
-                    clear();
-                    move(3, 2);
-                    printw("Step %d", i);
-                    move(4, 2);
-                    printw("Multiplier:   %s", multiplierString.c_str());
-                    move(5, 2);
-                    printw("Multiplicand: %s", multiplicandString.c_str());
-                    move(6, 2);
-                    printw("Product:      %s", product.c_str());
-                    move(7, 2);
-                    printw("Booth Bit:    %c", boothBit);
-                    move(10, 2);
-                    printw("An addition operation has been done with the multiplicand and the LHS of the product");
-
+                    printw("%s", whichOfThe4Options.c_str());
                     refresh();
                     waitThisLong(2000);
 
                     move(12, 2);
                     printw("Press any button to go to next step...");
+                    move(14, 2);
+                    printw("Press 't' to skip to the end...");
+
                     refresh();
-                    getch();
+                    choice = getch();
+                }
+
+                if (!userWantItToBeDone && (char)choice == 't')
+                {
+                    userWantItToBeDone = true;
+                    clear();
+                }
+
+                if (additionOperation)
+                {
+                    std::string replaceLHS = addBinary(product.substr(0, 32), multiplicandString);
+                    product = replaceLHS + product.substr(32);
+                    if(!userWantItToBeDone)
+                    {
+                        clear();
+                        move(3, 2);
+                        printw("Step %d", i);
+                        move(4, 2);
+                        printw("Multiplier:   %s", multiplierString.c_str());
+                        move(5, 2);
+                        printw("Multiplicand: %s", multiplicandString.c_str());
+                        move(6, 2);
+                        printw("Product:      %s", product.c_str());
+                        move(7, 2);
+                        printw("Booth Bit:    %c", boothBit);
+                        move(10, 2);
+                        printw("An addition operation has been done with the multiplicand and the LHS of the product");
+
+                        refresh();
+                        waitThisLong(2000);
+
+                        move(12, 2);
+                        printw("Press any button to go to next step...");
+                        refresh();
+                        getch();
+                    }
                 }
                 else if (subtractionOperation)
                 {
@@ -371,7 +391,36 @@ void BoothAlg::run()
                     std::string replaceLHS = addBinary(product.substr(0, 32), multiplicandStringNegated);
 
                     product = replaceLHS + product.substr(32);
+                    if (!userWantItToBeDone)
+                    {
+                        clear();
+                        move(3, 2);
+                        printw("Step %d", i);
+                        move(4, 2);
+                        printw("Multiplier:   %s", multiplierString.c_str());
+                        move(5, 2);
+                        printw("Multiplicand: %s", multiplicandString.c_str());
+                        move(6, 2);
+                        printw("Product:      %s", product.c_str());
+                        move(7, 2);
+                        printw("Booth Bit:    %c", boothBit);
+                        move(10, 2);
+                        printw("A subtraction operation has been done with the multiplicand and the LHS of the product");
 
+                        refresh();
+                        waitThisLong(2000);
+
+                        move(12, 2);
+                        printw("Press any button to go to next step...");
+                        refresh();
+                        getch();
+                    }
+                }
+
+                boothBit = shiftRightWithBoothBitReturn(product);
+
+                if (!userWantItToBeDone)
+                {
                     clear();
                     move(3, 2);
                     printw("Step %d", i);
@@ -384,7 +433,7 @@ void BoothAlg::run()
                     move(7, 2);
                     printw("Booth Bit:    %c", boothBit);
                     move(10, 2);
-                    printw("A subtraction operation has been done with the multiplicand and the LHS of the product");
+                    printw("Now to shift the product bits to the left...");
 
                     refresh();
                     waitThisLong(2000);
@@ -394,30 +443,6 @@ void BoothAlg::run()
                     refresh();
                     getch();
                 }
-
-                boothBit = shiftRightWithBoothBitReturn(product);
-
-                clear();
-                move(3, 2);
-                printw("Step %d", i);
-                move(4, 2);
-                printw("Multiplier:   %s", multiplierString.c_str());
-                move(5, 2);
-                printw("Multiplicand: %s", multiplicandString.c_str());
-                move(6, 2);
-                printw("Product:      %s", product.c_str());
-                move(7, 2);
-                printw("Booth Bit:    %c", boothBit);
-                move(10, 2);
-                printw("Now to shift the product bits to the left...");
-
-                refresh();
-                waitThisLong(2000);
-
-                move(12, 2);
-                printw("Press any button to go to next step...");
-                refresh();
-                getch();
 
                 // have to shift here
             }
